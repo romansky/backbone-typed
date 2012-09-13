@@ -1,0 +1,29 @@
+{
+    "name" : "backbone-typed",
+    "version" : "0.0.1",
+    "description" : "Run-time type support for backbone models",
+    "main" : "./index.js",
+    "keywords" : [
+        "backbone", "type","types","typed","backbone-typed","coffee"
+    ],
+    "repository" : {
+        "type" : "git",
+        "url" : "https://github.com/romansky/backbone-typed"
+    },
+    "dependencies" : {
+        "node-logr" : ">= 0.0.3",
+        "backbone" : ">= 0.9.2"
+    },
+    "devDependencies" : {
+	   "jasmine-node": ">= 1.0.26"
+    },
+    "scripts" : {},
+    "engine" : {"node" : ">=0.4.0"},
+    "author" : {
+        "name" : "Roman Landenband",
+        "email" : "roman.land@gmail.com",
+        "url" : "www.romansky.me"
+    }
+}
+
+
