@@ -14,7 +14,7 @@ Examples writtein in Coffee-Script but source is compiled to JS so no need to ha
 
 ## Usage
 
-		typed = require '../'
+		typed = require 'backbone-typed'
 		TypedModel = typed.TypedModel
 		Types = typed.Types
 
