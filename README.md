@@ -10,14 +10,13 @@ Examples writtein in Coffee-Script but source is compiled to JS so no need to ha
 
 ## Installation
 
-		npm install backbone-typed
+	npm install backbone-typed
 
 ## Usage
 
-		typed = require 'backbone-typed'
-		TypedModel = typed.TypedModel
-		Types = typed.Types
-
+	typed = require 'backbone-typed'
+	TypedModel = typed.TypedModel
+	Types = typed.Types
 
 ### Features
 
