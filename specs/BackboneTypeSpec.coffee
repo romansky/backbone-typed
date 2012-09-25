@@ -145,3 +145,25 @@ describe "Backbone Typed", ->
 		expect(cc.get("third")).toEqual({})
 
 
+	it "needs to support model inheritance", ->
+
+		class GrampsModel extends TypedModel
+			defaults : { grampsOne:null, grampsTwo : null }
+			types : { grampsOne: Types.Integer , grampsTwo : Types.String }
+
+		class ParentModel extends GrampsModel
+			defaults : { parentOne:null, parentTwo : null }
+			types : { parentOne: Types.Integer , parentTwo : Types.String }
+
+		class ChildModel extends ParentModel
+			defaults : { childOne:null, childTwo : null }
+			types : { childtOne: Types.Integer , childTwo : Types.String }
+
+		cm = new ChildModel()
+		expect(cm.__typesCache__).toEqual({ grampsOne: Types.Integer , grampsTwo : Types.String
+			,parentOne: Types.Integer , parentTwo : Types.String
+			,childtOne: Types.Integer , childTwo : Types.String  })
+
+		cm.set({ grampsOne: "5", parentTwo: 22 })
+		expect(cm.get("grampsOne")).toEqual(5)
+		expect(cm.get("parentTwo")).toEqual("22")
