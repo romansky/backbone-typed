@@ -1,6 +1,5 @@
 Backbone = require 'backbone'
 logr = require('node-logr').getLogger("backbone-typed")
-_ = require 'underscore'
 
 exports.TypedModel = class TypedModel extends Backbone.Model
 
@@ -26,9 +25,9 @@ exports.TypedModel = class TypedModel extends Backbone.Model
 				aModel = aModel.constructor.__super__
 			if parentTypes.length > 0
 				@__typesCache__ = {}
-				parentTypes.push( @__typesCache__ )
-				parentTypes.reverse()
-				_.extend.apply(_, parentTypes)
+				for parentType in parentTypes
+					for _prop, _val of parentType
+						@__typesCache__[_prop] = _val
 			else 
 				@__typesCache__ = null
 
