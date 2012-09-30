@@ -28,55 +28,55 @@ exports.TypedModel = class TypedModel extends Backbone.Model
 				for parentType in parentTypes
 					for _prop, _val of parentType
 						@__typesCache__[_prop] = _val
-			else 
+			else
 				@__typesCache__ = null
 
-		
+
 		if @__typesCache__ && attrs
 			keys = Object.keys(attrs)
-			for i in keys
-				if this.__typesCache__[i] and attrs[i] != null and	attrs[i] != undefined
-					switch this.__typesCache__[i]
-						when 'String' then if attrs[i]? then attrs[i] = String(attrs[i])
-						when 'Integer' then if attrs[i]?
-							if isNaN(attrs[i]) then ( exports._logDataDrop(i, attrs[i], this.__typesCache__[i]) ;  attrs[i] = null )
-							else attrs[i] = parseInt(attrs[i])
-						when 'Float' then if attrs[i]? 
-							if isNaN(attrs[i]) then ( exports._logDataDrop(i, attrs[i], this.__typesCache__[i]) ;  attrs[i] = null )
-							else attrs[i] = parseFloat(attrs[i])
-						when 'Boolean'
-							attrs[i] = switch attrs[i]
-								when "true","1" then true
-								when "false", "0" then false
-								else !!attrs[i]
-						else
-							if this.__typesCache__[i].prototype?.__typeName and this.__typesCache__[i](attrs[i]) then  #do nothing, its all good!
-							else
-								typedSet = if typeof this.__typesCache__[i] is "string" then this.__typesCache__[i] else this.__typesCache__[i].prototype?.__typeName
-								exports._logDataDrop(i, attrs[i], typedSet)
-								attrs[i] = null # dont allow value in
-		
+			for memberName in keys
+				if this.__typesCache__[memberName] and attrs[memberName] != null and	attrs[memberName] != undefined
+					typedSet = if typeof this.__typesCache__[memberName] is "string" then this.__typesCache__[memberName] else this.__typesCache__[memberName].prototype?.__typeName
+					if this.__typesCache__[memberName].prototype?.__typeName
+						origVal = attrs[memberName]
+						attrs[memberName] = this.__typesCache__[memberName](attrs[memberName])
+						if origVal and attrs[memberName] is null then exports._logDataDrop(memberName, origVal, typedSet)
+					else
+						exports._logDataDrop(memberName, attrs[memberName], typedSet)
+						attrs[memberName] = null # dont allow value in
+
 		super(key, value, options)
 
 
 exports._logDataDrop = (name, originalVal, typed)->
 	logr.error("backbone-typed nulled value of:\"#{name}\" value:\"#{originalVal}\" type:\"#{typed}\"")
 
+
+
+exports.signTypeFunction = (typeName, callme)->
+	inner = ()-> callme.apply(this, arguments)
+	inner.prototype.__typeName = typeName
+	inner.toString = ()-> inner.prototype.__typeName
+	inner
+
 exports.Types = {
-	"String"
-	"Integer"
-	"Float"
-	"Boolean"
-	"Enum" : (obj)->
+	String : exports.signTypeFunction "String", (param)->
+		if param then String(param) else null
+	Integer: exports.signTypeFunction "Integer", (param)->
+		return ( if not isNaN(param) then parseInt(param) else null )
+	Float : exports.signTypeFunction "Float", (param)->
+		return ( if not isNaN(param) then parseFloat(param) else null )
+	Boolean : exports.signTypeFunction "Boolean", (param)->
+		return switch param
+			when "true","1" then true
+			when "false", "0" then false
+			else !!param
+	Enum : (obj)->
 		_vals = (value for name,value of obj)
-		exports._getSignedProtoFunc( "Enum", (lookup)->
-			lookup in _vals
+		exports.signTypeFunction( "Enum", (lookup)->
+			_vals.filter((v)-> v==lookup)[0] || null
 		)
 }
 
 
 
-exports._getSignedProtoFunc = (typeName, callme)->
-	inner = ()-> callme.apply(this, arguments)
-	inner.prototype.__typeName = typeName
-	inner

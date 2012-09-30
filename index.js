@@ -2,8 +2,7 @@
 (function() {
   var Backbone, TypedModel, logr,
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Backbone = require('backbone');
 
@@ -20,7 +19,7 @@
     TypedModel.prototype.__typesCache__ = false;
 
     TypedModel.prototype.set = function(key, value, options) {
-      var aModel, attr, attrs, i, keys, parentType, parentTypes, typedSet, val, _i, _j, _len, _len1, _prop, _ref, _ref1, _val;
+      var aModel, attr, attrs, keys, memberName, origVal, parentType, parentTypes, typedSet, val, _i, _j, _len, _len1, _prop, _ref, _ref1, _val;
       attrs = attr = val = null;
       if (key === Object(key) || key === null) {
         attrs = key;
@@ -54,56 +53,18 @@
       if (this.__typesCache__ && attrs) {
         keys = Object.keys(attrs);
         for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
-          i = keys[_j];
-          if (this.__typesCache__[i] && attrs[i] !== null && attrs[i] !== void 0) {
-            switch (this.__typesCache__[i]) {
-              case 'String':
-                if (attrs[i] != null) {
-                  attrs[i] = String(attrs[i]);
-                }
-                break;
-              case 'Integer':
-                if (attrs[i] != null) {
-                  if (isNaN(attrs[i])) {
-                    exports._logDataDrop(i, attrs[i], this.__typesCache__[i]);
-                    attrs[i] = null;
-                  } else {
-                    attrs[i] = parseInt(attrs[i]);
-                  }
-                }
-                break;
-              case 'Float':
-                if (attrs[i] != null) {
-                  if (isNaN(attrs[i])) {
-                    exports._logDataDrop(i, attrs[i], this.__typesCache__[i]);
-                    attrs[i] = null;
-                  } else {
-                    attrs[i] = parseFloat(attrs[i]);
-                  }
-                }
-                break;
-              case 'Boolean':
-                attrs[i] = (function() {
-                  switch (attrs[i]) {
-                    case "true":
-                    case "1":
-                      return true;
-                    case "false":
-                    case "0":
-                      return false;
-                    default:
-                      return !!attrs[i];
-                  }
-                })();
-                break;
-              default:
-                if (((_ref = this.__typesCache__[i].prototype) != null ? _ref.__typeName : void 0) && this.__typesCache__[i](attrs[i])) {
-
-                } else {
-                  typedSet = typeof this.__typesCache__[i] === "string" ? this.__typesCache__[i] : (_ref1 = this.__typesCache__[i].prototype) != null ? _ref1.__typeName : void 0;
-                  exports._logDataDrop(i, attrs[i], typedSet);
-                  attrs[i] = null;
-                }
+          memberName = keys[_j];
+          if (this.__typesCache__[memberName] && attrs[memberName] !== null && attrs[memberName] !== void 0) {
+            typedSet = typeof this.__typesCache__[memberName] === "string" ? this.__typesCache__[memberName] : (_ref = this.__typesCache__[memberName].prototype) != null ? _ref.__typeName : void 0;
+            if ((_ref1 = this.__typesCache__[memberName].prototype) != null ? _ref1.__typeName : void 0) {
+              origVal = attrs[memberName];
+              attrs[memberName] = this.__typesCache__[memberName](attrs[memberName]);
+              if (origVal && attrs[memberName] === null) {
+                exports._logDataDrop(memberName, origVal, typedSet);
+              }
+            } else {
+              exports._logDataDrop(memberName, attrs[memberName], typedSet);
+              attrs[memberName] = null;
             }
           }
         }
@@ -119,12 +80,45 @@
     return logr.error("backbone-typed nulled value of:\"" + name + "\" value:\"" + originalVal + "\" type:\"" + typed + "\"");
   };
 
+  exports.signTypeFunction = function(typeName, callme) {
+    var inner;
+    inner = function() {
+      return callme.apply(this, arguments);
+    };
+    inner.prototype.__typeName = typeName;
+    inner.toString = function() {
+      return inner.prototype.__typeName;
+    };
+    return inner;
+  };
+
   exports.Types = {
-    "String": "String",
-    "Integer": "Integer",
-    "Float": "Float",
-    "Boolean": "Boolean",
-    "Enum": function(obj) {
+    String: exports.signTypeFunction("String", function(param) {
+      if (param) {
+        return String(param);
+      } else {
+        return null;
+      }
+    }),
+    Integer: exports.signTypeFunction("Integer", function(param) {
+      return (!isNaN(param) ? parseInt(param) : null);
+    }),
+    Float: exports.signTypeFunction("Float", function(param) {
+      return (!isNaN(param) ? parseFloat(param) : null);
+    }),
+    Boolean: exports.signTypeFunction("Boolean", function(param) {
+      switch (param) {
+        case "true":
+        case "1":
+          return true;
+        case "false":
+        case "0":
+          return false;
+        default:
+          return !!param;
+      }
+    }),
+    Enum: function(obj) {
       var name, value, _vals;
       _vals = (function() {
         var _results;
@@ -135,19 +129,12 @@
         }
         return _results;
       })();
-      return exports._getSignedProtoFunc("Enum", function(lookup) {
-        return __indexOf.call(_vals, lookup) >= 0;
+      return exports.signTypeFunction("Enum", function(lookup) {
+        return _vals.filter(function(v) {
+          return v === lookup;
+        })[0] || null;
       });
     }
-  };
-
-  exports._getSignedProtoFunc = function(typeName, callme) {
-    var inner;
-    inner = function() {
-      return callme.apply(this, arguments);
-    };
-    inner.prototype.__typeName = typeName;
-    return inner;
   };
 
 }).call(this);

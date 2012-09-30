@@ -5,7 +5,7 @@ Types = typed.Types
 
 describe "Backbone Typed", ->
 
-	it "needs to enforce a string type",->
+	it "enforces String",->
 		class StringTyped extends TypedModel
 			defaults : { checkMe : null }
 			types : { checkMe : Types.String }
@@ -17,7 +17,7 @@ describe "Backbone Typed", ->
 		expect(stBad.get("checkMe")).toEqual("5")
 		expect(stBad.get("checkMe")).not.toEqual(5)
 
-	it "needs to enforce an Integer type",->
+	it "enforces Integer",->
 		class IntegerTyped extends TypedModel
 			defaults : {checkMe : null}
 			types : {checkMe : Types.Integer}
@@ -30,7 +30,7 @@ describe "Backbone Typed", ->
 		it4 = new IntegerTyped({checkMe : null})
 		it5 = new IntegerTyped({checkMe : "badval"})
 
-		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "badval", Types.Integer)
+		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "badval", Types.Integer.toString())
 
 		expect(it.get("checkMe")).toEqual(200)
 		expect(it2.get("checkMe")).toEqual(200)
@@ -39,7 +39,7 @@ describe "Backbone Typed", ->
 		expect(it5.get("checkMe")).toBeNull()
 
 
-	it "needs to enforce Float type", ->
+	it "enforces Float", ->
 		class FloatTyped extends TypedModel
 			defaults : {checkMe : null}
 			types : {checkMe: Types.Float}
@@ -54,7 +54,7 @@ describe "Backbone Typed", ->
 		ft6 = new FloatTyped({checkMe : null})
 		ft7 = new FloatTyped({checkMe : "Zz.zZz."})
 
-		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "Zz.zZz.", Types.Float)
+		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "Zz.zZz.", Types.Float.toString())
 
 		expect(ft.get("checkMe")).toEqual(0)
 		expect(ft2.get("checkMe")).toEqual(1)
@@ -65,7 +65,7 @@ describe "Backbone Typed", ->
 		expect(ft7.get("checkMe")).toEqual(null)
 
 
-	it "needs to enforce Boolean", ->
+	it "enforces Boolean", ->
 		class BolTyped extends TypedModel
 			defaults : {checkMe: null}
 			types : {checkMe : Types.Boolean}
@@ -89,7 +89,7 @@ describe "Backbone Typed", ->
 
 
 
-	it "needs to enforce Enum", ->
+	it "enforces Enum", ->
 
 		myEnum = {
 			"First"
@@ -106,10 +106,10 @@ describe "Backbone Typed", ->
 		et2 = new EnumTyped({checkMe: myEnum.Second})
 		et3 = new EnumTyped({checkMe: myEnum.Third})
 		et4 = new EnumTyped({checkMe: "NOTFROMENUM"})
-		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "NOTFROMENUM", 'Enum')
+		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", "NOTFROMENUM", Types.Enum().toString())
 		et5 = new EnumTyped({checkMe: null})
 		et6 = new EnumTyped({checkMe: [myEnum.First]})
-		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", [myEnum.First], 'Enum')
+		expect(typed._logDataDrop).toHaveBeenCalledWith("checkMe", [myEnum.First], Types.Enum().toString())
 
 		expect(et.get("checkMe")).toEqual(myEnum.First)
 		expect(et2.get("checkMe")).toEqual(myEnum.Second)
@@ -121,7 +121,7 @@ describe "Backbone Typed", ->
 
 
 
-	it "needs to support a complex model",->
+	it "supports a complex model",->
 
 		options = {
 			"OPTION_1"
@@ -145,7 +145,7 @@ describe "Backbone Typed", ->
 		expect(cc.get("third")).toEqual({})
 
 
-	it "needs to support model inheritance", ->
+	it "supports model inheritance", ->
 
 		class GrampsModel extends TypedModel
 			defaults : { grampsOne:null, grampsTwo : null }
@@ -167,3 +167,18 @@ describe "Backbone Typed", ->
 		cm.set({ grampsOne: "5", parentTwo: 22 })
 		expect(cm.get("grampsOne")).toEqual(5)
 		expect(cm.get("parentTwo")).toEqual("22")
+
+
+	it "can be extended with custom types",->
+		myType = typed.signTypeFunction "Custom",(param)->
+			return if param is "its me!" then "yes"  else null
+
+
+		class CustomTyped extends TypedModel
+			defaults : {  testMe : null }
+			types : { testMe : myType }
+
+		ct = new CustomTyped({testMe : "its me!"})
+		expect(ct.get("testMe")).toEqual("yes")
+		ct.set({testMe : "its not me!"})
+		expect(ct.get("testMe")).toBeNull()

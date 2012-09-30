@@ -58,12 +58,29 @@ console.log myTypedModel2.toJSON()
 
 ```
 
+### Creating your own type!
 
-See more examples in specs.
+Sometimes its useful to have your own method that validates input and returns some output.
+Backbone-typed provides a method that "signs" the passed function, so that we know its there in purpose, and will even return its name if the ".toString()" of said function is called.
+
+```coffeescript
+# we sign the function
+myType = typed.signTypeFunction "Custom",(param)->
+	return if param is "its me!" then "yes"  else null
+
+# now use it in a model
+class CustomTyped extends TypedModel
+	defaults : {  testMe : null }
+	types : { testMe : myType }
+
+```
+
+
+More examples in specs.
 
 ## Future
 
-Option to create your own typed
+Libraries of additional types
 
 
 ## License
