@@ -182,3 +182,23 @@ describe "Backbone Typed", ->
 		expect(ct.get("testMe")).toEqual("yes")
 		ct.set({testMe : "its not me!"})
 		expect(ct.get("testMe")).toBeNull()
+
+	it "supports array type", ->
+
+		class ArrModel extends TypedModel
+			defaults : { arrMem:null }
+			types : { arrMem: Types.Array }
+
+		arrModel = new ArrModel({arrMem: ['one', 'two']})
+		expect(arrModel.toJSON()).toEqual({arrMem: ['one', 'two']})
+
+		arrModel.set({arrMem: {notArr : true}})
+		expect(arrModel.toJSON()).toEqual({arrMem: null})
+
+		arrModel.set({arrMem: "some str"})
+		expect(arrModel.toJSON()).toEqual({arrMem: null})
+
+		arrModel.set({arrMem: []})
+		expect(arrModel.toJSON()).toEqual({arrMem: []})
+
+

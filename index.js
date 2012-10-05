@@ -134,7 +134,10 @@
           return v === lookup;
         })[0] || null;
       });
-    }
+    },
+    Array: exports.signTypeFunction("Array", function(param) {
+      return (!Array.isArray(param) ? null : param);
+    })
   };
 
 }).call(this);

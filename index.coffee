@@ -76,6 +76,9 @@ exports.Types = {
 		exports.signTypeFunction( "Enum", (lookup)->
 			_vals.filter((v)-> v==lookup)[0] || null
 		)
+
+	Array : exports.signTypeFunction "Array", (param)->
+		return ( if not Array.isArray(param) then null else param )
 }
 
 
