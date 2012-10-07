@@ -79,6 +79,8 @@ exports.Types = {
 
 	Array : exports.signTypeFunction "Array", (param)->
 		return ( if not Array.isArray(param) then null else param )
+	Custom : (name, func)->
+		exports.signTypeFunction name, func
 }
 
 

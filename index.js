@@ -137,7 +137,10 @@
     },
     Array: exports.signTypeFunction("Array", function(param) {
       return (!Array.isArray(param) ? null : param);
-    })
+    }),
+    Custom: function(name, func) {
+      return exports.signTypeFunction(name, func);
+    }
   };
 
 }).call(this);

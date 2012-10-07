@@ -202,3 +202,16 @@ describe "Backbone Typed", ->
 		expect(arrModel.toJSON()).toEqual({arrMem: []})
 
 
+	it "has custom type shorthand",->
+		class CModel extends TypedModel
+                        defaults : { arrMem:null }
+                        types : { blah: Types.Custom("Blah", (val)-> return ( if val is "buzz" then val else null ) ) }
+
+
+		cModel = new CModel({blah: "buzz"})
+		expect(cModel.get("blah")).toEqual("buzz")
+
+		cModel.set({blah : "not buzz"})
+		expect(cModel.get("blah")).toBeNull()
+
+

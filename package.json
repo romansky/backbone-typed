@@ -1,6 +1,6 @@
 {
     "name" : "backbone-typed",
-    "version" : "0.1.1",
+    "version" : "0.1.2",
     "description" : "Run-time type support for backbone models",
     "main" : "./index.js",
     "keywords" : [
