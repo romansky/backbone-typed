@@ -15,10 +15,13 @@
         "backbone" : ">= 0.9.2"
     },
     "devDependencies" : {
-	   "jasmine-node": ">= 1.0.26"
+	   "jasmine-node": ">= 1.0.26",
+	   "coffee-script": "latest"
     },
-    "scripts" : {},
-    "engine" : {"node" : ">=0.4.0"},
+    "scripts" : {
+	"test": "cake test"
+    },
+    "engine" : {"node" : ">=0.6.0"},
     "author" : {
         "name" : "Roman Landenband",
         "email" : "roman.land@gmail.com",
