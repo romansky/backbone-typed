@@ -1,4 +1,4 @@
-backbone-typed
+backbone-typed [![Build Status](https://travis-ci.org/romansky/backbone-typed.png)](https://travis-ci.org/romansky/backbone-typed)
 ==============
 
 Run-time type support for backbone models
