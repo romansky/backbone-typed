@@ -1,6 +1,6 @@
 {
     "name" : "backbone-typed",
-    "version" : "0.1.2",
+    "version" : "0.1.4",
     "description" : "Run-time type support for backbone models",
     "main" : "./index.js",
     "keywords" : [
@@ -11,8 +11,8 @@
         "url" : "https://github.com/romansky/backbone-typed"
     },
     "dependencies" : {
-        "node-logr" : ">= 0.0.3",
-        "backbone" : ">= 0.9.10"
+        "node-logr" : ">= 0.1.*",
+        "backbone" : ">= 1.1.*"
     },
     "devDependencies" : {
 	   "jasmine-node": ">= 1.0.26",
@@ -21,7 +21,7 @@
     "scripts" : {
 	"test": "cake test"
     },
-    "engine" : {"node" : ">=0.6.0"},
+    "engine" : {"node" : ">=0.10.0"},
     "author" : {
         "name" : "Roman Landenband",
         "email" : "roman.land@gmail.com",
