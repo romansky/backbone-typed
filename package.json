@@ -11,7 +11,7 @@
         "url" : "https://github.com/romansky/backbone-typed"
     },
     "dependencies" : {
-        "node-logr" : ">= 0.1.*",
+        "node-logr" : ">= 0.1.0",
         "backbone" : ">= 1.1.*"
     },
     "devDependencies" : {
